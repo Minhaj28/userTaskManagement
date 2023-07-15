@@ -66,7 +66,7 @@ app.post("/users/login", async (req, res) => {
       if(!isValidPassword){
         res.status(401).json({ message: "wrong password" });
       } else {
-        const token = jwt.sign({email: user.email, id: user._id },'secret');
+        const token = jwt.sign({email: user.email, id: user._id },process.env.JWT_SECRET);
         const userObj = user.toJSON();
         userObj['accessToken'] = token;
         res.status(200).json(userObj);
@@ -78,6 +78,41 @@ app.post("/users/login", async (req, res) => {
   }
 });
 
+//? middleware to authenticate JWT access token
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
+  if(!token){
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  } else {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if(err){
+        res.status(401).json({ message: "Unauthorized" });
+      } else {
+        req.user = user;
+        next();
+      }
+    });
+    
+  }
+}
+
+app.get("/users/profile", authenticateToken , async (req,res) => {
+  try {
+    const id = req.user.id;
+    const user = await User.findById(id);
+    if (user) {
+      res.status(200).json(user);
+    } else {
+      res.status(404).json({ message: "user not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ massage: "Something is wrong with the server" });
+  }
+})
+
 app.get("/users", async (req, res) => {
   try {
     const users = await User.find({});
@@ -88,7 +123,7 @@ app.get("/users", async (req, res) => {
   }
 });
 
-app.get("/users/:id", async (req, res) => {
+app.get("/users/:id", authenticateToken, async (req, res) => {
   try {
     const id = req.params.id;
     const user = await User.findById(id);
