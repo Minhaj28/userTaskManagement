@@ -12,6 +12,8 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/users', require('./routes/api/users'));
+app.use('/api/tasks', require('./routes/api/tasks'));
+
 
 const port = process.env.PORT;
 app.listen(port, () => {

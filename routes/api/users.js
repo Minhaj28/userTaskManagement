@@ -211,7 +211,7 @@ function getUserTokens(user, res) {
   const accessToken = jwt.sign(
     { email: user.email, id: user._id },
     process.env.JWT_SECRET,
-    { expiresIn: "1m" }
+    { expiresIn: "10m" }
   );
   const refreshToken = jwt.sign(
     { email: user.email, id: user._id },
