@@ -10,7 +10,6 @@ const router = express.Router();
 router.post(
   "/",
   [
-    authenticateToken,
     body("fname", "fname is required").notEmpty(),
     body("lname", "lname is required").notEmpty(),
     body("email", "please enter a valid email").notEmpty().isEmail(),

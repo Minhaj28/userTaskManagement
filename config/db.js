@@ -7,7 +7,7 @@ const connectDB = async () => {
         uri, 
         { useNewUrlParser: true }
     )
-    console.log("Mongose Connection Open");
+    console.log("Mongoose Connection Open");
   } catch (error) {
     console.log(error.massage);
   }
